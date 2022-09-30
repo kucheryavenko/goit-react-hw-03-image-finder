@@ -1,12 +1,14 @@
 import { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container } from './App.styled';
-import { Searchbar } from 'components/Searchbar/Searchbar';
-import { ImageGallery } from 'components/ImageGallery/ImageGallery';
-import { Button } from 'components/Button/Button.styled';
-import { Loader } from 'components/Loader/Loader';
-// import { Modal } from 'components/Modal/Modal';
+import {
+  Container,
+  Searchbar,
+  ImageGallery,
+  Button,
+  Loader,
+  Notification,
+} from 'components';
 import { fetchData } from 'services/api';
 
 export class App extends Component {
@@ -15,7 +17,6 @@ export class App extends Component {
     searchQuery: '',
     page: 1,
     status: 'idle',
-    showModal: false,
   };
 
   componentDidUpdate(_, prevState) {
@@ -70,12 +71,6 @@ export class App extends Component {
     });
   };
 
-  // toggleModal = () => {
-  //   this.setState(({ showModal }) => ({
-  //     showModal: !showModal,
-  //   }));
-  // };
-
   render() {
     const { hits, status } = this.state;
     const { handleFormSubmit, onLoadMore } = this;
@@ -84,7 +79,9 @@ export class App extends Component {
       <Container>
         <Searchbar onSubmit={handleFormSubmit} />
         {status === 'rejected' && (
-          <h1>Ooops, someting went wrong. Please, try again.</h1>
+          <Notification>
+            Ooops, someting went wrong. Please, try again.
+          </Notification>
         )}
         {hits.length > 0 && status !== 'rejected' && (
           <ImageGallery hits={hits} />
@@ -93,7 +90,7 @@ export class App extends Component {
         {status === 'resolved' && hits.length > 0 && hits.length % 12 === 0 && (
           <Button onClick={onLoadMore}>LoadMore</Button>
         )}
-        <ToastContainer autoClose={3000} />
+        <ToastContainer autoClose={5000} />
       </Container>
     );
   }

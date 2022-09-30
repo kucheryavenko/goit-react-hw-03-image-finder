@@ -1,7 +1,8 @@
+import PropTypes from 'prop-types';
 import { List } from './ImageGallery.styled';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 
-export const ImageGallery = ({ onOpen, hits }) => {
+export const ImageGallery = ({ hits }) => {
   return (
     <List>
       {hits.map(({ id, webformatURL, tags, largeImageURL }) => {
@@ -16,4 +17,8 @@ export const ImageGallery = ({ onOpen, hits }) => {
       })}
     </List>
   );
+};
+
+ImageGallery.propTypes = {
+  hits: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
