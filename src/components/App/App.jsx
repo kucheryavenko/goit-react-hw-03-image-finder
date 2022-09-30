@@ -7,27 +7,44 @@ import { fetchData } from 'services/api';
 
 export class App extends Component {
   state = {
-    image: null,
+    hits: [],
     searchQuery: '',
+    page: 1,
     loading: false,
   };
 
-  async componentDidUpdate(_, prevState) {
-    const prevSearchQuery = prevState.searchQuery;
-    const currentSearchQuery = this.state.searchQuery;
+  componentDidUpdate(_, prevState) {
+    if (
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.page !== this.state.page
+    ) {
+      this.getImage(this.state.searchQuery, this.state.page);
+    }
+  }
 
+  getImage = async (searchQuery, page) => {
+    if (!searchQuery) {
+      return;
+    }
     try {
-      if (prevSearchQuery !== currentSearchQuery) {
-        this.setState({ loading: true });
-        const response = await fetchData(currentSearchQuery);
-        console.log(response);
+      this.setState({ loading: true });
+
+      const { hits } = await fetchData(searchQuery, page);
+      if (hits.length === 0) {
+        return;
       }
+
+      this.setState(prevState => {
+        return {
+          hits: [...prevState.hits, ...hits],
+        };
+      });
     } catch (error) {
       console.error(error);
     } finally {
       this.setState({ loading: false });
     }
-  }
+  };
 
   handleFormSubmit = searchQuery => {
     this.setState({ searchQuery });
@@ -40,7 +57,7 @@ export class App extends Component {
         <Searchbar onSubmit={handleFormSubmit} />
         {this.state.loading && <h1>Загружаем...</h1>}
         {this.state.image && <p>{this.state.image[0].id}</p>}
-        <ToastContainer autoClose={2500} />
+        <ToastContainer autoClose={3000} />
       </Container>
     );
   }

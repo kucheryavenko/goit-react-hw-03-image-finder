@@ -1,5 +1,7 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import { ImSearch } from 'react-icons/im';
+import { Header, Form, Btn, Input } from './Searchbar.styled';
 
 export class Searchbar extends Component {
   state = {
@@ -15,7 +17,7 @@ export class Searchbar extends Component {
     evt.preventDefault();
 
     if (searchQuery.trim() === '') {
-      toast.warn('Введите ключевое слово поиска!');
+      toast.warn('Please, enter your search term into the search field!');
       return;
     }
 
@@ -27,13 +29,13 @@ export class Searchbar extends Component {
     const { searchQuery } = this.state;
     const { handleQueryChange, handleSubmit } = this;
     return (
-      <header className="searchbar">
-        <form onSubmit={handleSubmit} className="form">
-          <button type="submit" className="button">
-            <span className="button-label">Search</span>
-          </button>
+      <Header>
+        <Form onSubmit={handleSubmit}>
+          <Btn type="submit">
+            <ImSearch />
+          </Btn>
 
-          <input
+          <Input
             className="input"
             type="text"
             // autocomplete="off"
@@ -42,8 +44,8 @@ export class Searchbar extends Component {
             value={searchQuery}
             onChange={handleQueryChange}
           />
-        </form>
-      </header>
+        </Form>
+      </Header>
     );
   }
 }
