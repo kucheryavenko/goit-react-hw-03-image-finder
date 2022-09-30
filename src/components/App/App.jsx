@@ -6,6 +6,7 @@ import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Button } from 'components/Button/Button.styled';
 import { Loader } from 'components/Loader/Loader';
+// import { Modal } from 'components/Modal/Modal';
 import { fetchData } from 'services/api';
 
 export class App extends Component {
@@ -14,6 +15,7 @@ export class App extends Component {
     searchQuery: '',
     page: 1,
     status: 'idle',
+    showModal: false,
   };
 
   componentDidUpdate(_, prevState) {
@@ -67,6 +69,12 @@ export class App extends Component {
       };
     });
   };
+
+  // toggleModal = () => {
+  //   this.setState(({ showModal }) => ({
+  //     showModal: !showModal,
+  //   }));
+  // };
 
   render() {
     const { hits, status } = this.state;
