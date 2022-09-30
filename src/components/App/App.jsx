@@ -1,8 +1,11 @@
 import { Component } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container } from './App.styled';
 import { Searchbar } from 'components/Searchbar/Searchbar';
+import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import { Button } from 'components/Button/Button.styled';
+import { Loader } from 'components/Loader/Loader';
 import { fetchData } from 'services/api';
 
 export class App extends Component {
@@ -10,7 +13,7 @@ export class App extends Component {
     hits: [],
     searchQuery: '',
     page: 1,
-    loading: false,
+    status: 'idle',
   };
 
   componentDidUpdate(_, prevState) {
@@ -27,13 +30,21 @@ export class App extends Component {
       return;
     }
     try {
-      this.setState({ loading: true });
+      this.setState({ status: 'pending' });
 
-      const { hits } = await fetchData(searchQuery, page);
+      const { hits, totalHits } = await fetchData(searchQuery, page);
+
       if (hits.length === 0) {
+        toast.error(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        this.setState({ status: 'rejected' });
         return;
       }
-
+      if (page === 1) {
+        toast.success(`Hooray! We found ${totalHits} images.`);
+      }
+      this.setState({ status: 'resolved' });
       this.setState(prevState => {
         return {
           hits: [...prevState.hits, ...hits],
@@ -41,22 +52,39 @@ export class App extends Component {
       });
     } catch (error) {
       console.error(error);
-    } finally {
-      this.setState({ loading: false });
+      this.setState({ status: 'rejected' });
     }
   };
 
   handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery });
+    this.setState({ searchQuery, page: 1, hits: [] });
+  };
+
+  onLoadMore = () => {
+    this.setState(prevState => {
+      return {
+        page: prevState.page + 1,
+      };
+    });
   };
 
   render() {
-    const { handleFormSubmit } = this;
+    const { hits, status } = this.state;
+    const { handleFormSubmit, onLoadMore } = this;
+
     return (
       <Container>
         <Searchbar onSubmit={handleFormSubmit} />
-        {this.state.loading && <h1>Загружаем...</h1>}
-        {this.state.image && <p>{this.state.image[0].id}</p>}
+        {status === 'rejected' && (
+          <h1>Ooops, someting went wrong. Please, try again.</h1>
+        )}
+        {hits.length > 0 && status !== 'rejected' && (
+          <ImageGallery hits={hits} />
+        )}
+        {status === 'pending' && <Loader />}
+        {status === 'resolved' && hits.length > 0 && hits.length % 12 === 0 && (
+          <Button onClick={onLoadMore}>LoadMore</Button>
+        )}
         <ToastContainer autoClose={3000} />
       </Container>
     );
